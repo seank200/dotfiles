@@ -9,6 +9,8 @@ config.conform = function()
             -- Use a sub-list to run only the first available formatter
             javascript = { { "prettierd", "prettier" } },
             typescript = { { "prettierd", "prettier" } },
+            javascriptreact = { { "prettierd", "prettier" } },
+            typescriptreact = { { "prettierd", "prettier" } },
         },
         -- Set up format-on-save autocmd
         -- This function is called on `BufWritePre`.
@@ -19,6 +21,8 @@ config.conform = function()
             end
             return { timeout_ms = 500, lsp_fallback = true }
         end,
+
+        notify_on_error = true,
     })
 
     vim.api.nvim_create_user_command("FormatStop", function(args)
@@ -43,7 +47,6 @@ config.conform = function()
             vim.g.disable_autoformat = false
             print("Auto-format on save is enabled.")
         end
-
     end, {
         desc = "Enable formatting on save",
         bang = true,

@@ -215,7 +215,7 @@ config.lualine = function()
                     "Telescope",
                 },
             },
-            globalstatus = true,
+            globalstatus = false,
         },
         sections = {
             lualine_a = { section_leftend },
@@ -228,7 +228,7 @@ config.lualine = function()
         inactive_sections = {
             lualine_a = {},
             lualine_b = {},
-            lualine_c = {},
+            lualine_c = { section_filetype, section_filename },
             lualine_x = {},
             lualine_y = {},
             lualine_z = {},
