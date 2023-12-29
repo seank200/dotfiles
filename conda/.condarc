@@ -1,0 +1,4 @@
+channels:
+  - defaults
+auto_activate_base: false
+env_prompt: '({default_env}) '
