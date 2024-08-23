@@ -1,6 +1,6 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  event = { "BufReadPre", "BufNewFile" }, 
+  event = { "BufReadPre", "BufNewFile" },
   build = ":TSUpdate",
   dependencies = {
     "windwp/nvim-ts-autotag",
@@ -12,20 +12,6 @@ return {
     local ts_autotag = require("nvim-ts-autotag")
 
     treesitter.setup({
-      ensure_installed = {
-        "bash",
-        "diff",
-        "gitcommit",
-        "gitignore",
-        "git_rebase",
-        "python",
-        "lua",
-        "vim",
-        "vimdoc",
-        "json",
-        "yaml",
-      },
-
       sync_install = false,
 
       -- Automatically install missing parsers when entering buffer
@@ -53,6 +39,5 @@ return {
       min_window_height = 20,
       mode = 'cursor',
     })
-
   end
 }
