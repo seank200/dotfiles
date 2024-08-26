@@ -8,15 +8,6 @@ fi
 
 source "${ZINIT_HOME}/zinit.zsh"
 
-# Plugins
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
-
-# Snippets
-zinit snippet OMZP::gitignore
-zinit snippet OMZP::command-not-found
-zinit snippet OMZP::sudo
 
 # History
 HISTSIZE=5000
@@ -31,14 +22,14 @@ setopt hist_save_no_dups
 setopt hist_ignore_dups
 setopt hist_find_no_dups
 
-# zsh-completions: Load completions
-autoload -U compinit && compinit
-zinit cdreplay -q
-
 # Completion
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'  # case-insensitive
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # colored
 zstyle ':completion:*' menu no
+
+# zsh-completions: Load completions
+autoload -U compinit && compinit
+zinit cdreplay -q
 
 # junegunn/fzf
 if command -v fzf &> /dev/null
@@ -46,6 +37,18 @@ then
   export FZF_DEFAULT_COMMAND="fd --hidden --strip-cwd-prefix --exclude .git"
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
   export FZF_ALT_C_COMMAND="fd --type=d --hidden --strip-cwd-prefix --exclude .git"
+
+  # Use fd (https://github.com/sharkdp/fd) for listing path candidates.
+  # - The first argument to the function ($1) is the base path to start traversal
+  # - See the source code (completion.{bash,zsh}) for the details.
+  _fzf_compgen_path() {
+    fd --hidden --exclude .git . "$1"
+  }
+
+  # Use fd to generate the list for directory completion
+  _fzf_compgen_dir() {
+    fd --type=d --hidden --exclude .git . "$1"
+  }
 
   eval "$(fzf --zsh)"
 
@@ -73,6 +76,20 @@ else
   echo "zshrc: Command 'eza' not found. Skipping configuration"
 fi
 
+# Snippets
+zinit snippet OMZP::gitignore
+zinit snippet OMZP::command-not-found
+zinit snippet OMZP::sudo
+
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-autosuggestions
+
+# NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
 # Keybindings
 bindkey '^f' autosuggest-accept
 bindkey '^p' history-search-backward
@@ -82,7 +99,7 @@ bindkey '^n' history-search-forward
 if command -v oh-my-posh &> /dev/null
 then
   if [[ -d "${HOME}/.config/ohmyposh" ]];then
-    OMP_CONFIG_PATH="${HOME}/.config/ohmyposh/catppuccin_macchiato_custom.yaml"
+    OMP_CONFIG_PATH="${HOME}/.config/ohmyposh/seank200.yaml"
   else
     OMP_CONFIG_PATH="$(brew --prefix oh-my-posh)/themes/catppuccin_macchiato.omp.json"
   fi
