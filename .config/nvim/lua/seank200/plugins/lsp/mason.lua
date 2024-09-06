@@ -29,7 +29,6 @@ return {
         "cssls",
         "tailwindcss",
         "emmet_language_server",
-        "eslint_d",
         "lua_ls",
 
         -- `tsserver` is being renamed to `ts_ls` as of lsp 0.2.0
