@@ -1,0 +1,18 @@
+set nu
+set rnu
+
+Plug 'machakann/vim-highlightedyank'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
+
+set commentary
+set surround
+set incsearch
+
+let mapleader = " "
+noremap <leader>ss :split<cr>
+noremap <leader>sv :vsplit<cr>
+noremap <leader>ar <Action>(Run)
+noremap <leader>as <Action>(Stop)
+
+inoremap jk <esc>
