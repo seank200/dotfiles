@@ -21,5 +21,6 @@ return {
     keymap.set("n", "<S-h>", "<cmd>BufferLineCyclePrev<CR>", opts)
     keymap.set("n", "<S-l>", "<cmd>BufferLineCycleNext<CR>", opts)
     keymap.set("n", "<leader>bo", "<cmd>BufferLineCloseOthers<CR>", opts)
+    keymap.set("n", "<leader>bp", "<cmd>BufferLinePickClose<CR>", opts)
   end
 }

@@ -6,3 +6,4 @@ keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode with jk" })
 
 keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" })
 keymap.set("n", "<leader>ss", "<C-w>s", { desc = "Split window vertically" })
+keymap.set("n", "<leader>bd", "<cmd>bd|bp<CR>", { desc = "Close current buffer", remap = false, silent = true })
