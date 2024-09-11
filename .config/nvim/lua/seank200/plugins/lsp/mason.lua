@@ -33,7 +33,7 @@ return {
 
         -- `tsserver` is being renamed to `ts_ls` as of lsp 0.2.0
         -- Should modify after release
-        "tsserver",
+        "ts_ls",
         "pyright",
       }
     })

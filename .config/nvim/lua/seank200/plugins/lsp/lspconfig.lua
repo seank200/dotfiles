@@ -3,8 +3,9 @@ return {
   event = { "BufReadPre", "BufNewFile" },
   dependencies = {
     "hrsh7th/cmp-nvim-lsp",
+    "hrsh7th/nvim-cmp",
     { "antosha417/nvim-lsp-file-operations", config = true },
-    { "folke/neodev.nvim", opts = {} },
+    { "folke/neodev.nvim",                   opts = {} },
   },
   config = function()
     local lspconfig = require("lspconfig")
@@ -42,9 +43,6 @@ return {
         opts.desc = "Smart rename"
         keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts) -- smart rename
 
-        -- opts.desc = "Show buffer diagnostics"
-        -- keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts) -- show  diagnostics for file
-
         opts.desc = "Show line diagnostics"
         keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts) -- show diagnostics for line
 
@@ -64,14 +62,6 @@ return {
 
     -- used to enable autocompletion (assign to every lsp server config)
     local capabilities = cmp_nvim_lsp.default_capabilities()
-
-    -- Change the Diagnostic symbols in the sign column (gutter)
-    -- (not in youtube nvim video)
-    -- local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-    -- for type, icon in pairs(signs) do
-    --   local hl = "DiagnosticSign" .. type
-    --   vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-    -- end
 
     mason_lspconfig.setup_handlers({
       -- default handler for installed servers

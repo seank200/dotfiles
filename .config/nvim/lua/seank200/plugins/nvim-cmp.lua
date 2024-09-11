@@ -1,9 +1,9 @@
 return {
   "hrsh7th/nvim-cmp",
-  event = "InsertEnter",
+  event = { "InsertEnter", "CmdlineEnter" },
   dependencies = {
     "hrsh7th/cmp-buffer", -- source for text in buffer
-    "hrsh7th/cmp-path", -- source for file system paths
+    "hrsh7th/cmp-path",   -- source for file system paths
     {
       "L3MON4D3/LuaSnip",
       -- follow latest release.
@@ -11,9 +11,9 @@ return {
       -- install jsregexp (optional!).
       build = "make install_jsregexp",
     },
-    "saadparwaiz1/cmp_luasnip", -- for autocompletion
+    "saadparwaiz1/cmp_luasnip",     -- for autocompletion
     "rafamadriz/friendly-snippets", -- useful snippets
-    "onsails/lspkind.nvim", -- vs-code like pictograms
+    "onsails/lspkind.nvim",         -- vs-code like pictograms
   },
   config = function()
     local cmp = require("cmp")
@@ -34,7 +34,7 @@ return {
           return false
         end
 
-        -- Do not autocomplete when in prompts 
+        -- Do not autocomplete when in prompts
         local is_in_propmt = vim.api.nvim_buf_get_option(0, "buftype") == "prompt"
         if is_in_propmt then
           return false
@@ -59,17 +59,18 @@ return {
         ["<C-j>"] = cmp.mapping.select_next_item(), -- next suggestion
         ["<C-b>"] = cmp.mapping.scroll_docs(-4),
         ["<C-f>"] = cmp.mapping.scroll_docs(4),
-        ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
-        ["<ESC>"] = cmp.mapping.abort(), -- close completion window
+        ["<C-Space>"] = cmp.mapping.complete(),                                                     -- show completion suggestions
+        ["<ESC>"] = cmp.mapping.abort(),                                                            -- close completion window
         ["<CR>"] = cmp.mapping.confirm({ select = false }),
+        ["<Tab>"] = cmp.mapping.confirm({ select = true, behavior = cmp.ConfirmBehavior.Replace }), -- auto accept first item and replace adjacent text with it
       }),
 
       -- sources for autocompletion
       sources = cmp.config.sources({
         { name = "nvim_lsp" }, -- autocomplete
-        { name = "luasnip" }, -- snippets
-        { name = "buffer" }, -- text within current buffer
-        { name = "path" }, -- file system paths
+        { name = "luasnip" },  -- snippets
+        { name = "buffer" },   -- text within current buffer
+        { name = "path" },     -- file system paths
       }),
 
       -- configure lspkind for vs-code like pictograms in completion menu
@@ -83,4 +84,3 @@ return {
     })
   end,
 }
-      
