@@ -92,8 +92,8 @@ export NVM_DIR="$HOME/.nvm"
 
 # Keybindings
 bindkey '^f' autosuggest-accept
-bindkey '^p' history-search-backward
-bindkey '^n' history-search-forward
+bindkey '^p' history-beginning-search-backward
+bindkey '^n' history-beginning-search-forward
 bindkey '^[[C' autosuggest-accept
 bindkey '^[[A' history-search-backward
 bindkey '^[[B' history-search-forward
