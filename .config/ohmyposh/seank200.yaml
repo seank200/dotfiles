@@ -6,10 +6,10 @@ blocks:
 - type: prompt
   alignment: left
   segments:
-  - type: upgrade
-    style: plain
-    template: "\uf019 "
-    foreground: yellow
+  # - type: upgrade
+  #   style: plain
+  #   template: "\uf019 "
+  #   foreground: yellow
   - type: path
     style: plain
     template: "{{if .Segments.Git.Ref}}{{if hasPrefix .Segments.Git.Dir .Path}}󰊢 {{.Segments.Git.RepoName}}{{.Path | replace .Segments.Git.Dir \"\"}}{{else}}󰊢 {{.Segments.Git.RepoName}} <magenta>{{ trimPrefix .Segments.Git.Dir .Path}}</>{{end}}{{else}}\uf07b {{.Path}}{{end}} "
@@ -43,6 +43,14 @@ blocks:
     text: ""
     duration: 0s
     namelength: 0
+  - type: python
+    style: plain
+    template: " {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}{{ .Venv }} {{ end }}{{ .Full }}{{ end }}"
+    foreground: magenta
+    properties:
+      fetch_virtual_env: true
+      display_default: false
+      fetch_version: false
   - type: text
     style: plain
     template: 
