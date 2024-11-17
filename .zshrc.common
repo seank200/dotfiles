@@ -50,7 +50,7 @@ then
     fd --type=d --hidden --exclude .git . "$1"
   }
 
-  eval "$(fzf --zsh)"
+  source <(fzf --zsh)
 
   zinit light Aloxaf/fzf-tab
 
