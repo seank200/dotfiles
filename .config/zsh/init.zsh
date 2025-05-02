@@ -4,7 +4,6 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_STATE_HOME="$HOME/.local/state"
 
-export EDITOR="nvim"
 
 # ========= Define Utility Functions ========
 function __pathprepend() {
@@ -205,6 +204,11 @@ fi
 if command -v eza &> /dev/null
 then
 	alias ls="eza --color=never --icons=auto --group-directories-first --git"
+fi
+
+if command -v nvim &> /dev/null
+then
+  export EDITOR="nvim"
 fi
 
 
