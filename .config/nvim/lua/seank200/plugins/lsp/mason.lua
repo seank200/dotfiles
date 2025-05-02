@@ -8,15 +8,7 @@ return {
     local mason_lspconfig = require("mason-lspconfig")
 
     -- enable mason and configure icons
-    mason.setup({
-      -- ui = {
-      --   icons = {
-      --     package_installed = "✓",
-      --     package_pending = "➜",
-      --     package_uninstalled = "✗",
-      --   },
-      -- },
-    })
+    mason.setup({})
 
     mason_lspconfig.setup({
       ensure_installed = {
@@ -24,15 +16,7 @@ return {
         "vimls",
         "jsonls",
         "yamlls",
-
-        "html",
-        "cssls",
-        "tailwindcss",
-        "emmet_language_server",
         "lua_ls",
-
-        -- `tsserver` is being renamed to `ts_ls` as of lsp 0.2.0
-        -- Should modify after release
         "ts_ls",
         "pyright",
       }

@@ -3,10 +3,10 @@ return {
     "catppuccin/nvim",
     name = "catppuccin",
     priority = 1000,
-    config = function()
-      vim.cmd [[
-        colorscheme catppuccin-macchiato
-      ]]
-    end
+    opts = {
+      flavour = "mocha",
+      transparent_background = true,
+      show_end_of_buffer = true
+    }
   }
 }

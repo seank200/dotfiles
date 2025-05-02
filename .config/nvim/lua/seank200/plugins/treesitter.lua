@@ -12,11 +12,31 @@ return {
     local ts_autotag = require("nvim-ts-autotag")
 
     treesitter.setup({
-      sync_install = false,
-
       -- Automatically install missing parsers when entering buffer
       -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
       auto_install = true,
+
+      ensure_installed = {
+        "c",
+        "python",
+        "java",
+        "javascript",
+        "json",
+        "lua",
+        "vim",
+        "vimdoc",
+        "markdown",
+        "git_config",
+        "git_rebase",
+        "gitattributes",
+        "gitcommit",
+        "gitignore",
+        "sql",
+        "typescript",
+        "yaml"
+      },
+
+      sync_install = false,  -- install "ensure_installed" synchronously
 
       indent = {
         enable = true,
