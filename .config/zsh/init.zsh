@@ -150,6 +150,7 @@ zinit snippet OMZP::sudo
 
 
 # ======== Configure Development Environment ========
+__pathprepend "$HOME/.local/bin"
 __pathprepend "$HOMEBREW_PREFIX/opt/openjdk@17/bin"
 __pathprepend "$HOMEBREW_PREFIX/opt/postgresql@16/bin"
 

@@ -18,6 +18,6 @@ config.window_background_opacity = 0.9
 -- config.macos_window_background_blur = 10
 
 config.initial_cols = 120
-config.initial_rows = 40
+config.initial_rows = 48
 
 return config
