@@ -1,0 +1,21 @@
+let mapleader = " "
+
+set scrolloff=5
+set incsearch
+set number
+set relativenumber
+
+Plug 'machakann/vim-highlightedyank'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
+
+set commentary
+set surround
+
+inoremap jk <Esc>
+nnoremap <leader>ss :split<CR>
+nnoremap <leader>sv :vsplit<CR>
+
+map <leader>ar <Action>(Run)
+map <leader>as <Action>(Stop)
+
