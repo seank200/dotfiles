@@ -10,22 +10,43 @@ local function mason_config()
         return
       end
 
+      vim.b.format_on_save = false
+
       if client:supports_method("textDocument/completion") then
         vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
       end
 
-      -- Auto-format ("lint") on save.
-      -- Usually not needed if server supports "textDocument/willSaveWaitUntil".
       if not client:supports_method('textDocument/willSaveWaitUntil')
           and client:supports_method('textDocument/formatting') then
-        -- vim.api.nvim_create_autocmd('BufWritePre', {
-        --   buffer = ev.buf,
-        --   callback = function()
-        --     vim.lsp.buf.format({ bufnr = ev.buf, id = client.id, timeout_ms = 1000 })
-        --   end,
-        -- })
-        vim.keymap.set("n", "grf", function()
+        vim.api.nvim_create_autocmd('BufWritePre', {
+          buffer = ev.buf,
+          callback = function()
+            if vim.b.format_on_save then
+              vim.lsp.buf.format({ bufnr = ev.buf, id = client.id, timeout_ms = 1000 })
+            end
+          end,
+        })
+
+        -- Manually trigger linting
+        vim.keymap.set("n", "<leader>f", function()
+          print("Formatting using '" .. client.name .. "'...")
           vim.lsp.buf.format({ bufnr = ev.buf, id = client.id, timeout_ms = 1000 })
+          print("Formatted using '" .. client.name .. "'.")
+        end, { buffer = ev.buf })
+
+        -- Toggle automatic linting
+        vim.keymap.set("n", "<leader>F", function()
+          local option = ""
+          if vim.b.format_on_save then
+            option = "disabled"
+            vim.b.format_on_save = false
+          else
+            option = "enabled"
+            vim.b.format_on_save = true
+            vim.lsp.buf.format({ bufnr = ev.buf, id = client.id, timeout_ms = 1000 })
+          end
+
+          print("Format-on-save " .. option .. " (client: '" .. client.name .. "')")
         end, { buffer = ev.buf })
       end
     end,
