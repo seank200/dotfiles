@@ -29,4 +29,6 @@ opt.splitbelow = true
 
 opt.colorcolumn = "80"
 
+opt.completeopt = "menuone,popup,noinsert"
+
 vim.cmd.colorscheme "catppuccin"

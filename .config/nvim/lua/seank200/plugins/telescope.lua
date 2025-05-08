@@ -30,10 +30,13 @@ return {
     telescope.load_extension("fzf")
 
     local keymap = vim.keymap
-    keymap.set("n", "<leader><space>", "<cmd>Telescope find_files<CR>", { desc = "Search for a file in cwd", noremap=true })
-    keymap.set("n", "<leader>/", "<cmd>Telescope live_grep<CR>", { desc = "Search string in files in cwd", noremap=true })
-    keymap.set("n", "<leader>tg", "<cmd>Telescope grep_string<CR>", { desc = "Search for the word under the cursor in cwd", noremap=true })
-    keymap.set("n", "<leader>tb", "<cmd>Telescope buffers<CR>", { desc = "Search for open buffers", noremap=true })
-    keymap.set("n", "<leader>tt", "<cmd>TodoTelescope<CR>", { desc = "Search for todo comments", noremap=true })
+    keymap.set("n", "<leader><space>", "<cmd>Telescope find_files<CR>",
+      { desc = "Search for a file in cwd", noremap = true })
+    keymap.set("n", "<leader>/", "<cmd>Telescope live_grep<CR>",
+      { desc = "Search string in files in cwd", noremap = true })
+    keymap.set("n", "<leader>tg", "<cmd>Telescope grep_string<CR>",
+      { desc = "Search for the word under the cursor in cwd", noremap = true })
+    keymap.set("n", "<leader>tb", "<cmd>Telescope buffers<CR>", { desc = "Search for open buffers", noremap = true })
+    keymap.set("n", "<leader>tt", "<cmd>TodoTelescope<CR>", { desc = "Search for todo comments", noremap = true })
   end
 }

@@ -15,7 +15,6 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({ 
   { import = "seank200.plugins" },
-  { import = "seank200.plugins.lsp"},
 }, {
   checker = {
     enabled = true,
