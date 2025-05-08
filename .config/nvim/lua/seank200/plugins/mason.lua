@@ -1,5 +1,47 @@
+---@param package_names string[] Array of Mason package names
+---@return nil
+local function mason_ensure_installed(package_names)
+  local registry = require("mason-registry")
+
+  -- Key: required package name
+  -- Value: false (not installed)
+  local required_status = {}
+  for _, required_name in pairs(package_names) do
+    required_status[required_name] = false
+  end
+
+  -- Key: installed package name
+  -- Value: true (installed)
+  local installed_names = registry.get_installed_package_names()
+  for _, installed_name in pairs(installed_names) do
+    required_status[installed_name] = true
+  end
+
+  local is_install_cmd_required = false
+  local install_cmd = "MasonInstall"
+  for required_name, is_installed in pairs(required_status) do
+    if not is_installed then
+      is_install_cmd_required = true
+      install_cmd = install_cmd .. " " .. required_name
+    end
+  end
+
+  if is_install_cmd_required then
+    vim.cmd(install_cmd)
+  end
+end
+
 local function mason_config()
   require("mason").setup()
+  mason_ensure_installed({
+    "bash-language-server",
+    "lua-language-server",
+    "json-lsp",
+    "pylint",
+    "vim-language-server",
+    "yaml-language-server",
+  })
+
   require("mason-lspconfig").setup()
 
   vim.api.nvim_create_autocmd("LspAttach", {
@@ -27,14 +69,14 @@ local function mason_config()
           end,
         })
 
-        -- Manually trigger linting
+        -- Manually trigger formatting
         vim.keymap.set("n", "<leader>f", function()
           print("Formatting using '" .. client.name .. "'...")
           vim.lsp.buf.format({ bufnr = ev.buf, id = client.id, timeout_ms = 1000 })
           print("Formatted using '" .. client.name .. "'.")
-        end, { buffer = ev.buf })
+        end, { buffer = ev.buf, desc = "Format buffer (LSP)" })
 
-        -- Toggle automatic linting
+        -- Toggle automatic formatting
         vim.keymap.set("n", "<leader>F", function()
           local option = ""
           if vim.b.format_on_save then
@@ -47,7 +89,7 @@ local function mason_config()
           end
 
           print("Format-on-save " .. option .. " (client: '" .. client.name .. "')")
-        end, { buffer = ev.buf })
+        end, { buffer = ev.buf, desc = "Toggle format-on-save (LSP)" })
       end
     end,
   })
