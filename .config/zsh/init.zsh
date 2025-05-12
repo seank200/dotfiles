@@ -18,7 +18,7 @@ function __pathprepend() {
 # ======== ZSH Options ========
 
 # History options
-HISTSIZE=99999999
+HISTSIZE=9999999
 HISTFILE="$HOME/.zsh_history"
 SAVEHIST=$HISTSIZE
 HISTDUP=erase
@@ -122,7 +122,7 @@ fi
 
 if command -v eza &> /dev/null
 then
-	alias ls="eza --color=auto --icons=auto --group-directories-first --git"
+	alias ls="eza --color=auto --icons=never --group-directories-first --git"
 fi
 
 if command -v nvim &> /dev/null
@@ -142,18 +142,36 @@ autoload -Uz compinit
 setopt prompt_subst  # enable prompt parameter substitution
 
 autoload -Uz vcs_info
-zstyle ':vcs_info:*' enable git cvs svn
-zstyle ':vcs_info:*' check-for-changes true
-
-zstyle ':vcs_info:*' unstagedstr '*'  # unstaged changes
+zstyle ':vcs_info:*' enable git svn  # only enable specific backends
+zstyle ':vcs_info:*' check-for-changes true  # enables %u, %c
+zstyle ':vcs_info:*' unstagedstr '~'  # unstaged changes
 zstyle ':vcs_info:*' stagedstr '+'  # staged changes
 zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
-zstyle ':vcs_info:*' actionformats ' %F{cyan}%b%f%F{green}%c%f%F{red}%u%f%F{magenta}%m%f%F{1}(%a)%f'  # ongoing action (merge, rebase)
-zstyle ':vcs_info:*' formats ' %F{cyan}%b%f%F{green}%c%f%F{red}%u%f%F{magenta}%m%f'  # format
+
+# Inside VCS repository
+# - %r: Repository name
+# - %S: Repository subdirectory
+# - %c: staged changes (stagedstr)
+# - %u: unstaged changes (unstagedstr)
+# - %m: misc (see set-message hooks below)
+zstyle ':vcs_info:*' formats '%F{blue}%B%r%%b%S%f %b%F{green}%c%F{red}%u%F{magenta}%m%f'
+
+# Ongoing action (e.g. interactive rebase, merge conflict, etc.)
+# - (identical to 'formats' above)
+# - %a: action
+zstyle ':vcs_info:*' actionformats '%F{blue}%B%r%%b%S%f %b%F{green}%c%F{red}%u%F{magenta}%m%f %F{yellow}%B%a%%b%f'
+
+# No VCS detected 
+# - %~: cwd (with $HOME replaced with '~') 
+zstyle ':vcs_info:*' nvcsformats '%~'
 
 zstyle ':vcs_info:git*+set-message:*' hooks git-st
+
 +vi-git-st(){
     git rev-parse --is-inside-work-tree &>/dev/null || return
+
+    hook_com[subdir]="/${hook_com[subdir]}"
+    hook_com[subdir]="${hook_com[subdir]%%/.}"
 
     local ahead behind
     local -a gitstatus
@@ -165,21 +183,23 @@ zstyle ':vcs_info:git*+set-message:*' hooks git-st
     (( $behind )) && gitstatus+=( "-${behind// /}" )
 
     if [[ $ahead -gt 0 || $behind -gt 0 ]]; then
-      hook_com[misc]+=" [${(j:/:)gitstatus}]"
+      hook_com[misc]+=" [${(j:|:)gitstatus}]"
     fi
     
     # If there are untracked files in repo
     if git status --porcelain | grep '??' &> /dev/null ; then
-        hook_com[unstaged]+='?'
+        hook_com[unstaged]='~'
+    fi
+
+    stashed=$(git stash list --no-color --oneline | wc -l)
+    if [[ $stashed -gt 0 ]]; then
+      hook_com[unstaged]+='*'
     fi
 }
 
 precmd () { vcs_info }
 
-PROMPT=''
-PROMPT+='%F{blue}%1d%f'
-PROMPT+='${vcs_info_msg_0_}'
-PROMPT+=' %(?.%#.%B%F{red}%#%b%f) '		# red prompt if previous command has a non-zero exit code
+PROMPT='$vcs_info_msg_0_ %B%(?.%#.%F{red}%#%f)%b '
 
 # ======== Aliases ========
 alias ll="ls -l"
