@@ -10,93 +10,6 @@ function __pathprepend() {
 	[ -d "$1" ] && export PATH="$1:$PATH"
 }
 
-function __git_symbols() {
-	# Symbols
-	local ahead='↑'
-	local behind='↓'
-	local diverged='↕'
-	local no_remote=''
-	local staged='+'
-	local untracked='?'
-	local modified='!'
-	local moved='>'
-	local deleted='x'
-	local stashed='*'
-
-	local output_symbols=''
-
-	local git_status_v
-	git_status_v="$(git status --porcelain=v2 --branch --show-stash 2>/dev/null)"
-
-	# Parse branch information
-	local ahead_count behind_count
-
-	# AHEAD, BEHIND, DIVERGED
-	if echo $git_status_v | grep -q "^# branch.ab " ; then
-		# One line of the git status output looks like this:
-		# # branch.ab +1 -2
-		# In the line below:
-		# - we grep for the line starting with # branch.ab
-		# - we grep for the numbers and output them on separate lines
-		# - we remove the + and - signs
-		# - we put the two numbers into variables, while telling read to use a newline as the delimiter for reading
-		read -d "\n" -r ahead_count behind_count <<< $(echo "$git_status_v" | grep "^# branch.ab" | grep -o -E '[+-][0-9]+' | sed 's/[-+]//')
-		# Show the ahead and behind symbols when relevant
-		[[ $ahead_count != 0 ]] && output_symbols+=" %F{blue}$ahead$ahead_count%f"
-		[[ $behind_count != 0 ]] && output_symbols+=" %F{blue}$behind$behind_count%f"
-	fi
-
-	# STASHED
-	echo $git_status_v | grep -q "^# stash " && output_symbols+=" $stashed"
-
-	# STAGED
-	[[ $(git diff --name-only --cached) ]] && output_symbols+=" $staged"
-
-	# For the rest of the symbols, we use the v1 format of git status because it's easier to parse.
-	local git_status
-
-	symbols="$(git status --porcelain=v1 | cut -c1-2 | sed 's/ //g')"
-
-	local untracked_count=0
-	local modified_count=0
-	local moved_count=0
-	local deleted_count=0
-
-	while IFS= read -r symbol; do
-		case $symbol in
-			??) (( untracked_count += 1 )) ;;
-			M) (( modified_count += 1 )) ;;
-			R) (( moved_count += 1 )) ;;
-			D) (( deleted_count += 1 )) ;;
-		esac
-	done <<< "$symbols"
-
-	[[ $untracked_count != 0 ]] && output_symbols+=" %F{green}$untracked$untracked_count%f"
-	[[ $modified_count != 0 ]] && output_symbols+=" %F{yellow}$modified$modified_count%f"
-	[[ $moved_count != 0 ]] && output_symbols+=" %F{yellow}$moved$moved_count%f"
-	[[ $deleted_count != 0 ]] && output_symbols+=" %F{red}$deleted$deleted_count%f"
-
-	[[ -n $output_symbols ]] && echo -n "$output_symbols"
-}
-
-
-# Function to display Git status with symbols
-function __git_info() {
-	local git_info=''
-	local git_branch_name=''
-
-	if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-		# Get the Git branch name
-		git_branch_name="$(git symbolic-ref --short HEAD 2>/dev/null)"
-		if [[ -n "$git_branch_name" ]]; then
-			git_info+="%F{magenta}󰘬 $git_branch_name%f"
-		fi
-		# Get the Git status
-		git_info+="$(__git_symbols)"
-		echo "$git_info "
-	fi
-}
-
 
 # ======== Homebrew ========
 [ -d "/opt/homebrew/bin" ] && eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -209,7 +122,7 @@ fi
 
 if command -v eza &> /dev/null
 then
-	alias ls="eza --color=never --icons=auto --group-directories-first --git"
+	alias ls="eza --color=auto --icons=auto --group-directories-first --git"
 fi
 
 if command -v nvim &> /dev/null
@@ -228,13 +141,47 @@ autoload -Uz compinit
 # ======== Prompt ========
 setopt prompt_subst  # enable prompt parameter substitution
 
-PROMPT=''
-PROMPT+='%F{blue}%~%f '			# cwd (substitute home directory with '~')
-PROMPT+='$(__git_info)'	# git
-PROMPT+='%(?.%#.%F{red}%#%f) '		# red prompt if previous command has a non-zero exit code
+autoload -Uz vcs_info
+zstyle ':vcs_info:*' enable git cvs svn
+zstyle ':vcs_info:*' check-for-changes true
 
+zstyle ':vcs_info:*' unstagedstr '*'  # unstaged changes
+zstyle ':vcs_info:*' stagedstr '+'  # staged changes
+zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
+zstyle ':vcs_info:*' actionformats ' %F{cyan}%b%f%F{green}%c%f%F{red}%u%f%F{magenta}%m%f%F{1}(%a)%f'  # ongoing action (merge, rebase)
+zstyle ':vcs_info:*' formats ' %F{cyan}%b%f%F{green}%c%f%F{red}%u%f%F{magenta}%m%f'  # format
+
+zstyle ':vcs_info:git*+set-message:*' hooks git-st
++vi-git-st(){
+    git rev-parse --is-inside-work-tree &>/dev/null || return
+
+    local ahead behind
+    local -a gitstatus
+
+    ahead=$(git rev-list ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null | wc -l)
+    (( $ahead )) && gitstatus+=( "+${ahead// /}" )
+
+    behind=$(git rev-list HEAD..${hook_com[branch]}@{upstream} 2>/dev/null | wc -l)
+    (( $behind )) && gitstatus+=( "-${behind// /}" )
+
+    if [[ $ahead -gt 0 || $behind -gt 0 ]]; then
+      hook_com[misc]+=" [${(j:/:)gitstatus}]"
+    fi
+    
+    # If there are untracked files in repo
+    if git status --porcelain | grep '??' &> /dev/null ; then
+        hook_com[unstaged]+='?'
+    fi
+}
+
+precmd () { vcs_info }
+
+PROMPT=''
+PROMPT+='%F{blue}%1d%f'
+PROMPT+='${vcs_info_msg_0_}'
+PROMPT+=' %(?.%#.%B%F{red}%#%b%f) '		# red prompt if previous command has a non-zero exit code
 
 # ======== Aliases ========
 alias ll="ls -l"
-alias la="ls -a"
+alias la="ls -la"
 alias tree="ls --tree"
