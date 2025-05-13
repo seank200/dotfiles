@@ -199,7 +199,7 @@ zstyle ':vcs_info:git*+set-message:*' hooks git-st
 
 precmd () { vcs_info }
 
-PROMPT='$vcs_info_msg_0_ %B%(?.%#.%F{red}%#%f)%b '
+PROMPT='$vcs_info_msg_0_ %B%(?.%#.%F{red}?%? %#%f)%b '
 
 # ======== Aliases ========
 alias ll="ls -l"
