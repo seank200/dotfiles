@@ -82,6 +82,13 @@ then
 fi
 
 
+# ======== Configure Autocomplete ========
+zstyle ':completion:*' menu no					# show menu
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'		# case-insensitive
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"		# colored ls
+autoload -Uz compinit && compinit
+
+
 # ======== Configure Command Line Utilities ========
 if command -v fzf &> /dev/null
 then
@@ -113,12 +120,10 @@ then
 	fi
 fi
 
-
 if command -v zoxide &> /dev/null
 then
 	eval "$(zoxide init --cmd cd zsh)"
 fi
-
 
 if command -v eza &> /dev/null
 then
@@ -129,13 +134,6 @@ if command -v nvim &> /dev/null
 then
   export EDITOR="nvim"
 fi
-
-
-# ======== Configure Autocomplete ========
-zstyle ':completion:*' menu no					# show menu
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'		# case-insensitive
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"		# colored ls
-autoload -Uz compinit
 
 
 # ======== Prompt ========
