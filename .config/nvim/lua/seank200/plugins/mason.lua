@@ -56,6 +56,8 @@ local function mason_config()
 
       if client:supports_method("textDocument/completion") then
         vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+
+        vim.keymap.set("i", "<C-k>", vim.lsp.completion.get, { noremap = true, desc = "Trigger autocomplete" })
       end
 
       if not client:supports_method('textDocument/willSaveWaitUntil')
