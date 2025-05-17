@@ -1,8 +1,11 @@
-# ========= Set XDG Path =========
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_STATE_HOME="$HOME/.local/state"
+
+export ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+export NVM_DIR="$HOME/.nvm"
+export PYENV_ROOT="$HOME/.pyenv"
 
 
 # ========= Define Utility Functions ========
@@ -34,7 +37,6 @@ bindkey '^n' history-beginning-search-forward
 
 
 # ======== Plugin Manager ========
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
 if [ ! -d "$ZINIT_HOME" ]; then
   mkdir -p "$(dirname $ZINIT_HOME)"
@@ -67,16 +69,12 @@ __pathprepend "$HOME/.local/bin"
 __pathprepend "$HOMEBREW_PREFIX/opt/openjdk@17/bin"
 __pathprepend "$HOMEBREW_PREFIX/opt/postgresql@16/bin"
 
-if command -v nvm &> /dev/null
-then
-  export NVM_DIR="$HOME/.nvm"
+if [[ -d $NVM_DIR ]]; then
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 fi
 
-if command -v pyenv &> /dev/null
-then
-  export PYENV_ROOT="$HOME/.pyenv"
+if [[ -d $PYENV_ROOT ]]; then
   [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
   eval "$(pyenv init - zsh)"
 fi
@@ -127,7 +125,7 @@ fi
 
 if command -v eza &> /dev/null
 then
-	alias ls="eza --color=auto --icons=never --group-directories-first --git"
+	alias ls="eza --color=never --icons=never --group-directories-first --git"
 fi
 
 if command -v nvim &> /dev/null
@@ -152,24 +150,21 @@ zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
 # - %c: staged changes (stagedstr)
 # - %u: unstaged changes (unstagedstr)
 # - %m: misc (see set-message hooks below)
-zstyle ':vcs_info:*' formats '%F{blue}%B%r%%b%S%f %b%F{green}%c%F{red}%u%F{magenta}%m%f'
+zstyle ':vcs_info:*' formats '%F{blue}%B%%8~%%b%f %b%F{green}%c%F{red}%u%F{magenta}%m%f'
 
 # Ongoing action (e.g. interactive rebase, merge conflict, etc.)
 # - (identical to 'formats' above)
 # - %a: action
-zstyle ':vcs_info:*' actionformats '%F{blue}%B%r%%b%S%f %b%F{green}%c%F{red}%u%F{magenta}%m%f %F{yellow}%B%a%%b%f'
+zstyle ':vcs_info:*' actionformats '%F{blue}%B%%8~%%b%f %b%F{green}%c%F{red}%u%F{magenta}%m%f %F{yellow}%B%a%%b%f'
 
 # No VCS detected 
 # - %~: cwd (with $HOME replaced with '~') 
-zstyle ':vcs_info:*' nvcsformats '%~'
+zstyle ':vcs_info:*' nvcsformats '%8~'
 
 zstyle ':vcs_info:git*+set-message:*' hooks git-st
 
 +vi-git-st(){
     git rev-parse --is-inside-work-tree &>/dev/null || return
-
-    hook_com[subdir]="/${hook_com[subdir]}"
-    hook_com[subdir]="${hook_com[subdir]%%/.}"
 
     local ahead behind
     local -a gitstatus
