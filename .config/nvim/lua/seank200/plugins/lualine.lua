@@ -1,5 +1,4 @@
-
-local section_leftend = {
+local section_logo = {
     function()
         return ""
     end,
@@ -22,37 +21,6 @@ local section_branch = {
     icon = "",
 }
 
-local lazy_status = require("lazy.status")
-local section_lazy_status = {
-  lazy_status.updates,
-  cond = lazy_status.has_updates
-}
-
--- local section_rightend = {
---     function()
---         if vim.env.SSH_CLIENT or vim.env.SSH_TTY then
---             if vim.o.columns > 60 then
---                 local hostname = vim.fn.hostname()
---                 if string.len(hostname) > 16 then
---                     hostname = string.sub(hostname, 1, 14) .. ".."
---                 end
---                 return ' 󰑔 ' .. hostname .. ' '
---             else
---                 return ' 󰑔 '
---             end
---         end
---         return ' '
---     end,
---     padding = 0,
--- }
-
--- local section_filetype = {
---     "filetype",
---     padding = { left = 1, right = 0 },
---     colored = true,
---     icon_only = true,
--- }
-
 return {
   "nvim-lualine/lualine.nvim",
   dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -69,12 +37,12 @@ return {
           globalstatus = false,
       },
       sections = {
-          lualine_a = { section_leftend },
-          lualine_b = {},
+          lualine_a = {},
+          lualine_b = { section_logo },
           lualine_c = { section_filename, "diagnostics", "diff" },
           lualine_x = { "selection", "progress", "location" },
-          lualine_y = { section_lazy_status },
-          lualine_z = { section_branch },
+          lualine_y = { section_branch },
+          lualine_z = {},
       },
       inactive_sections = {
           lualine_a = {},
