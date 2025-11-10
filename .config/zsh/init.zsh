@@ -15,12 +15,25 @@ function __pathprepend() {
 
 
 # ======== Homebrew ========
-[ -d "/opt/homebrew/bin" ] && eval "$(/opt/homebrew/bin/brew shellenv)"
+if [ -d "/opt/homebrew/bin" ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+if [ -d "$(brew --prefix)/share/zsh/site-functions" ]; then
+  fpath+=("$(brew --prefix)/share/zsh/site-functions")
+fi
 
 
-# ======== ZSH Options ========
+# ======== Plugin Manager (zinit) ========
+if [ ! -d "$ZINIT_HOME" ]; then
+  mkdir -p "$(dirname $ZINIT_HOME)"
+  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+fi
 
-# History options
+source "${ZINIT_HOME}/zinit.zsh"
+
+
+# History
 HISTSIZE=9999999
 HISTFILE="$HOME/.zsh_history"
 SAVEHIST=$HISTSIZE
@@ -36,35 +49,48 @@ bindkey '^p' history-beginning-search-backward
 bindkey '^n' history-beginning-search-forward
 
 
-# ======== Plugin Manager ========
-
-if [ ! -d "$ZINIT_HOME" ]; then
-  mkdir -p "$(dirname $ZINIT_HOME)"
-  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-fi
-
-source "${ZINIT_HOME}/zinit.zsh"
-
-
-# ======== Initialize Plugins ========
-zinit light zsh-users/zsh-history-substring-search
-bindkey '^[[A' history-substring-search-up  # up arrow
-bindkey '^[[B' history-substring-search-down  # down arrow
+# zsh-users/zsh-history-substring-search
 HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND=''
 HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND=''
 HISTORY_SUBSTRING_SEARCH_FUZZY='true'
+zinit light zsh-users/zsh-history-substring-search
+bindkey '^[[A' history-substring-search-up  # up arrow
+bindkey '^[[B' history-substring-search-down  # down arrow
 
+# zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-autosuggestions
 bindkey '^f' autosuggest-accept
 zstyle ':autocomplete:*' min-input 3
 
+# sindresorhus/pure
+zinit ice compile src'pure.zsh'
+zinit light sindresorhus/pure
+
+autoload -Uz promptinit; promptinit
+prompt_newline='%666v'
+PROMPT=" $PROMPT"
+
+print() { # No newlines between propmts 
+  [[ $# -eq 0 && ${funcstack[-1]} = prompt_pure_precmd ]] || builtin print "$@"
+}
+
+
 zinit light zsh-users/zsh-completions
 
+zinit light zdharma-continuum/fast-syntax-highlighting
+
 zinit snippet OMZP::gitignore
+
 zinit snippet OMZP::sudo
 
 
-# ======== Configure Development Environment ========
+# ======== Autocomplete ========
+zstyle ':completion:*' menu no					# show menu
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'		# case-insensitive
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"		# colored ls
+autoload -Uz compinit && compinit
+
+
 __pathprepend "$HOME/.local/bin"
 __pathprepend "$HOMEBREW_PREFIX/opt/openjdk@17/bin"
 __pathprepend "$HOMEBREW_PREFIX/opt/postgresql@16/bin"
@@ -80,14 +106,6 @@ if [[ -d $PYENV_ROOT ]]; then
 fi
 
 
-# ======== Configure Autocomplete ========
-zstyle ':completion:*' menu no					# show menu
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'		# case-insensitive
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"		# colored ls
-autoload -Uz compinit && compinit
-
-
-# ======== Configure Command Line Utilities ========
 if command -v fzf &> /dev/null
 then
 	export FZF_DEFAULT_COMMAND="fd --hidden --strip-cwd-prefix --exclude .git"
@@ -133,68 +151,4 @@ then
   export EDITOR="nvim"
 fi
 
-
-# ======== Prompt ========
-setopt prompt_subst  # enable prompt parameter substitution
-
-autoload -Uz vcs_info
-zstyle ':vcs_info:*' enable git svn  # only enable specific backends
-zstyle ':vcs_info:*' check-for-changes true  # enables %u, %c
-zstyle ':vcs_info:*' unstagedstr '~'  # unstaged changes
-zstyle ':vcs_info:*' stagedstr '+'  # staged changes
-zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
-
-# Inside VCS repository
-# - %r: Repository name
-# - %S: Repository subdirectory
-# - %c: staged changes (stagedstr)
-# - %u: unstaged changes (unstagedstr)
-# - %m: misc (see set-message hooks below)
-zstyle ':vcs_info:*' formats '%F{blue}%B%%8~%%b%f %b%F{green}%c%F{red}%u%F{magenta}%m%f'
-
-# Ongoing action (e.g. interactive rebase, merge conflict, etc.)
-# - (identical to 'formats' above)
-# - %a: action
-zstyle ':vcs_info:*' actionformats '%F{blue}%B%%8~%%b%f %b%F{green}%c%F{red}%u%F{magenta}%m%f %F{yellow}%B%a%%b%f'
-
-# No VCS detected 
-# - %~: cwd (with $HOME replaced with '~') 
-zstyle ':vcs_info:*' nvcsformats '%8~'
-
-zstyle ':vcs_info:git*+set-message:*' hooks git-st
-
-+vi-git-st(){
-    git rev-parse --is-inside-work-tree &>/dev/null || return
-
-    local ahead behind
-    local -a gitstatus
-
-    ahead=$(git rev-list ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null | wc -l)
-    (( $ahead )) && gitstatus+=( "+${ahead// /}" )
-
-    behind=$(git rev-list HEAD..${hook_com[branch]}@{upstream} 2>/dev/null | wc -l)
-    (( $behind )) && gitstatus+=( "-${behind// /}" )
-
-    if [[ $ahead -gt 0 || $behind -gt 0 ]]; then
-      hook_com[misc]+=" [${(j:|:)gitstatus}]"
-    fi
-    
-    # If there are untracked files in repo
-    if git status --porcelain | grep '??' &> /dev/null ; then
-        hook_com[unstaged]='~'
-    fi
-
-    stashed=$(git stash list --no-color --oneline | wc -l)
-    if [[ $stashed -gt 0 ]]; then
-      hook_com[unstaged]+='*'
-    fi
-}
-
-precmd () { vcs_info }
-
-PROMPT='$vcs_info_msg_0_ %B%(?.%#.%F{red}?%? %#%f)%b '
-
-# ======== Aliases ========
-alias ll="ls -l"
-alias la="ls -la"
 alias tree="ls --tree"
