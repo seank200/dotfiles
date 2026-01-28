@@ -14,7 +14,7 @@ config.color_scheme = 'Catppuccin Mocha'
 config.enable_tab_bar = false
 -- config.window_decorations = "RESIZE"
 
-config.window_background_opacity = 0.9
+config.window_background_opacity = 0.85
 -- config.macos_window_background_blur = 10
 
 config.initial_cols = 120
