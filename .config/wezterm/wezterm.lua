@@ -3,10 +3,13 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
 config.font = wezterm.font_with_fallback {
-  { family = "JetBrainsMonoNL Nerd Font Mono", harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' } },
-  "Meslo"
+  { family = "JetBrainsMonoNL Nerd Font Mono", weight="Medium", harfbuzz_features = { 'calt=1', 'clig=0', 'liga=0' } },
+  "Menlo",
+  "Monaco",
+  "Courier New",
+  "monospace"
 }
-config.font_size = 15
+config.font_size = 16
 config.line_height = 1.1
 
 config.color_scheme = 'Catppuccin Mocha'

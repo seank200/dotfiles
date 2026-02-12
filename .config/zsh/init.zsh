@@ -63,14 +63,16 @@ bindkey '^f' autosuggest-accept
 zstyle ':autocomplete:*' min-input 3
 
 # sindresorhus/pure
-zinit ice compile src'pure.zsh'
+zinit ice pick"async.zsh" src"pure.zsh"
 zinit light sindresorhus/pure
+# zstyle ':prompt:pure:git:branch' color cyan
+zstyle ':prompt:pure:git:dirty' color red
+zstyle ':prompt:pure:prompt:success' color default
 
 autoload -Uz promptinit; promptinit
-prompt_newline='%666v'
-PROMPT=" $PROMPT"
-
-print() { # No newlines between propmts 
+prompt_newline=" "
+export PURE_GIT_PULL=0
+print() { # No newlines between prompts 
   [[ $# -eq 0 && ${funcstack[-1]} = prompt_pure_precmd ]] || builtin print "$@"
 }
 
@@ -139,11 +141,6 @@ fi
 if command -v zoxide &> /dev/null
 then
 	eval "$(zoxide init --cmd cd zsh)"
-fi
-
-if command -v eza &> /dev/null
-then
-	alias ls="eza --color=never --icons=never --group-directories-first --git"
 fi
 
 if command -v nvim &> /dev/null
