@@ -7,7 +7,7 @@ return {
     "nvim-treesitter/nvim-treesitter-context",
   },
   config = function()
-    local treesitter = require("nvim-treesitter.configs")
+    local treesitter = require("nvim-treesitter.config")
     local treesitter_context = require("treesitter-context")
     local ts_autotag = require("nvim-ts-autotag")
 
