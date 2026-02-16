@@ -219,6 +219,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
       vim.cmd [[ inoremap <silent><expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>" ]]
       vim.cmd [[ inoremap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>" ]]
+      vim.cmd [[ inoremap <expr> <cr> pumvisible() ? '<c-y>' : '<cr>' ]]
     end
 
     -- Formatting
