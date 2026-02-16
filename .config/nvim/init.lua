@@ -64,6 +64,8 @@ MiniDeps.setup({ path = { package = mini.packpath } })
 MiniDeps.add({ source = 'catppuccin/nvim', name = 'catppuccin' })
 vim.o.termguicolors = true
 vim.cmd.colorscheme('catppuccin')
+vim.cmd('hi Normal guibg=NONE ctermbg=NONE')
+vim.cmd('hi NormalNC guibg=NONE ctermbg=NONE') -- Non-focused buffer
 
 MiniDeps.add('folke/which-key.nvim')
 MiniDeps.add('christoomey/vim-tmux-navigator')
