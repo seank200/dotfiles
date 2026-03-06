@@ -63,18 +63,15 @@ bindkey '^f' autosuggest-accept
 zstyle ':autocomplete:*' min-input 3
 
 # sindresorhus/pure
-zinit ice pick"async.zsh" src"pure.zsh"
+zinit ice compile'(pure|async).zsh' pick'async.zsh' src'pure.zsh'
 zinit light sindresorhus/pure
-# zstyle ':prompt:pure:git:branch' color cyan
+zinit fpath sindresorhus/pure
 zstyle ':prompt:pure:git:dirty' color red
 zstyle ':prompt:pure:prompt:success' color default
 
-autoload -Uz promptinit; promptinit
-prompt_newline=" "
 export PURE_GIT_PULL=0
-print() { # No newlines between prompts 
-  [[ $# -eq 0 && ${funcstack[-1]} = prompt_pure_precmd ]] || builtin print "$@"
-}
+autoload -Uz promptinit; promptinit
+prompt pure
 
 
 zinit light zsh-users/zsh-completions
